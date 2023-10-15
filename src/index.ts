@@ -1,0 +1,1 @@
+export const BOT_TOKEN = 'MTE2MjcyMjY2MTI3NzkxMzE4OA.GuEqW9.0HJGAfpumfTcFuVuXB-IRA6c5bpv0HHBpteugs'
