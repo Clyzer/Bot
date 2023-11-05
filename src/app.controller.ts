@@ -8,7 +8,7 @@ export class AppController {
   @Post('/draft')
   async getHello(@Body() body): Promise<string> {
     if (body['action'] == 'MATCH_STARTED') {
-      return this.appService.getDraftLol(body['channel']);
+      return this.appService.getDraftLol(body['channel'], body['match_number']);
     } else {
       return '¡Evento incorrecto!';
     }
