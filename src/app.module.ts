@@ -11,8 +11,7 @@ import { GatewayIntentBits } from 'discord.js';
     DiscordModule.forRootAsync({
       useFactory: () => ({
         token:
-          process.env.BOT_TOKEN ||
-          'MTE2MjcyMjY2MTI3NzkxMzE4OA.GCS5EA.hOkUR795xXlR7hOs6HAwpWDnAEeVakQvrBmFTo',
+          process.env.BOT_TOKEN,
         discordClientOptions: {
           intents: [
             GatewayIntentBits.Guilds,
