@@ -192,9 +192,7 @@ export class AppService {
         '\nNombre: ' +
         process.env.NAME_QUEUE +
         matchNumber +
-        '\nContraseña: ' +
-        process.env.PASSWORD_QUEUE +
-        matchNumber;
+        '\nContraseña: 12345';
       //embeds: [{ title: 'In-House Draft', description: message }],
       this.client.channels.fetch(channel).then((channelFetched) => {
         const text = channelFetched as TextBasedChannel;
