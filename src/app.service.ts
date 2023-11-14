@@ -148,7 +148,7 @@ export class AppService {
     });
   }
 
-  async getDraftLol(channel: string): Promise<string> {
+  async getDraftLol(channel: string, matchNumber: number): Promise<string> {
     const ws = new WebSocket('wss://draftlol.dawe.gg/');
     ws.addEventListener('open', () => {
       const data = {
@@ -179,10 +179,10 @@ export class AppService {
         'Crear partida personalizada con la siguiente configuración:' +
         '\nNombre: ' +
         process.env.NAME_QUEUE +
-        data['match_number'] +
+        matchNumber +
         '\nContraseña: ' +
         process.env.PASSWORD_QUEUE +
-        data['match_number'];
+        matchNumber;
       //embeds: [{ title: 'In-House Draft', description: message }],
       this.client.channels.fetch(channel).then((channelFetched) => {
         const text = channelFetched as TextBasedChannel;
