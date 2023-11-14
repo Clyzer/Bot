@@ -42,12 +42,12 @@ export class AppService {
         console.error(error);
         if (interaction.replied || interaction.deferred) {
           await interaction.followUp({
-            content: 'There was an error while executing this command!',
+            content: 'Hubo un error al ejecutar este comando!',
             ephemeral: true,
           });
         } else {
           await interaction.reply({
-            content: 'There was an error while executing this command!',
+            content: 'Hubo un error al ejecutar este comando!',
             ephemeral: true,
           });
         }
@@ -114,9 +114,9 @@ export class AppService {
                 const matchData: MatchDto = match.data;
                 let winner: number;
                 if (matchData.info.teams[0].win) {
-                  winner = Number('1');
+                  winner = 1;
                 } else {
-                  winner = Number('2');
+                  winner = 2;
                 }
                 const dataFinal = {
                   server_id: matchServer,
@@ -143,14 +143,17 @@ export class AppService {
                           ' como ganador.',
                       );
                     },
-                    error: (err: AxiosError) => {
-                      console.log(err.response.statusText);
+                    error: () => {
+                      console.log(
+                        'Ocurrió un error al finalizar la partida numero ' +
+                          matchNum,
+                      );
                     },
                   });
               }
             },
             error: () => {
-              console.log('No es una partida valida');
+              console.log('El código de partida no es valido');
             },
           });
       }
