@@ -58,11 +58,11 @@ export class AppService {
 
   newGuild(): void {
     this.client.on(Events.GuildAvailable, (guild) => {
-      this.generateCommands(guild.id);
+      this.generateCommands(guild.id, this.client.application.id);
     });
   }
 
-  async generateCommands(guildId: string): Promise<void> {
+  async generateCommands(guildId: string, botId: string): Promise<void> {
     const commands = [];
     const foldersPath = path.join(__dirname, 'commands');
     const commandFolders = fs
@@ -80,7 +80,7 @@ export class AppService {
     try {
       if (guildId) {
         await this.client.rest.put(
-          Routes.applicationGuildCommands(process.env.BOT_CLIENTID, guildId),
+          Routes.applicationGuildCommands(botId, guildId),
           { body: commands },
         );
       }
@@ -102,48 +102,58 @@ export class AppService {
       ) {
         const matchNum = Number(message.channel.name.split('-')[1]);
         const matchServer = message.guild.id;
-        const match = await firstValueFrom(
-          this.httpService.get<MatchDto>(
+        this.httpService
+          .get<MatchDto>(
             'https://americas.api.riotgames.com/lol/match/v5/matches/LA2_' +
               message.content +
               '?api_key=' +
               process.env.RIOT_API_KEY,
-          ),
-        );
-        if (match.status == 200) {
-          const matchData: MatchDto = match.data;
-          let winner: number;
-          if (matchData.info.teams[0].win) {
-            winner = Number('1');
-          } else {
-            winner = Number('2');
-          }
-          const dataFinal = {
-            server_id: matchServer,
-            match_number: matchNum,
-            team_num: winner,
-          };
-          this.httpService
-            .post('https://api.neatqueue.com/api/outcome/winner', dataFinal, {
-              headers: {
-                Authorization: process.env.NEAT_API_KEY,
-              },
-            })
-            .subscribe({
-              next: () => {
-                console.log(
-                  'Partida ' +
-                    matchNum +
-                    ' finalizada con el equipo ' +
-                    winner +
-                    ' como ganador.',
-                );
-              },
-              error: (err: AxiosError) => {
-                console.log(err.response.statusText);
-              },
-            });
-        }
+          )
+          .subscribe({
+            next: (match) => {
+              if (match.status == 200) {
+                const matchData: MatchDto = match.data;
+                let winner: number;
+                if (matchData.info.teams[0].win) {
+                  winner = Number('1');
+                } else {
+                  winner = Number('2');
+                }
+                const dataFinal = {
+                  server_id: matchServer,
+                  match_number: matchNum,
+                  team_num: winner,
+                };
+                this.httpService
+                  .post(
+                    'https://api.neatqueue.com/api/outcome/winner',
+                    dataFinal,
+                    {
+                      headers: {
+                        Authorization: process.env.NEAT_API_KEY,
+                      },
+                    },
+                  )
+                  .subscribe({
+                    next: () => {
+                      console.log(
+                        'Partida ' +
+                          matchNum +
+                          ' finalizada con el equipo ' +
+                          winner +
+                          ' como ganador.',
+                      );
+                    },
+                    error: (err: AxiosError) => {
+                      console.log(err.response.statusText);
+                    },
+                  });
+              }
+            },
+            error: () => {
+              console.log('No es una partida valida');
+            },
+          });
       }
     });
   }
