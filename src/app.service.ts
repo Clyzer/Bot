@@ -1,7 +1,6 @@
 import { InjectDiscordClient } from '@discord-nestjs/core';
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { AxiosError } from 'axios';
 import {
   ChannelType,
   Client,
