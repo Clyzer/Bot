@@ -93,8 +93,8 @@ export class AppService {
   async onMessageFinalizer(): Promise<void> {
     this.client.on(Events.MessageCreate, async (message) => {
       if (
-        message.channel.type == ChannelType.GuildText &&
-        message.channel.name.startsWith(process.env.QUEUE_NAME + '-') &&
+        message.channel.type === ChannelType.GuildText &&
+        message.channel.name.startsWith(`${process.env.QUEUE_NAME}-`) &&
         message.content.length >= 10 &&
         this.reg.test(message.content)
       ) {
@@ -102,14 +102,11 @@ export class AppService {
         const matchServer = message.guild.id;
         this.httpService
           .get<MatchDto>(
-            'https://americas.api.riotgames.com/lol/match/v5/matches/LA2_' +
-              message.content +
-              '?api_key=' +
-              process.env.RIOT_API_KEY,
+            `https://americas.api.riotgames.com/lol/match/v5/matches/LA2_${message.content}?api_key=${process.env.RIOT_API_KEY}`,
           )
           .subscribe({
             next: (match) => {
-              if (match.status == 200) {
+              if (match.status === 200) {
                 const matchData: MatchDto = match.data;
                 let winner: number;
                 if (matchData.info.teams[0].win) {
@@ -135,17 +132,12 @@ export class AppService {
                   .subscribe({
                     next: () => {
                       console.log(
-                        'Partida ' +
-                          matchNum +
-                          ' finalizada con el equipo ' +
-                          winner +
-                          ' como ganador.',
+                        `Partida ${matchNum} finalizada con el equipo ${winner} como ganador.`,
                       );
                     },
                     error: () => {
                       console.log(
-                        'Ocurrió un error al finalizar la partida numero ' +
-                          matchNum,
+                        `Ocurrió un error al finalizar la partida numero ${matchNum}`,
                       );
                     },
                   });
@@ -176,22 +168,10 @@ export class AppService {
     ws.addEventListener('message', (ev) => {
       const data = JSON.parse(ev.data as string);
       const message =
-        '🔵 https://draftlol.dawe.gg/' +
-        data['roomId'] +
-        '/' +
-        data['bluePassword'] +
-        '\n🔴 https://draftlol.dawe.gg/' +
-        data['roomId'] +
-        '/' +
-        data['redPassword'] +
-        '\n👁️ https://draftlol.dawe.gg/' +
-        data['roomId'];
+        // biome-ignore lint/complexity/useLiteralKeys: <explanation>
+        `🔵 https://draftlol.dawe.gg/${data['roomId']}/${data['bluePassword']}\n🔴 https://draftlol.dawe.gg/${data['roomId']}/${data['redPassword']}\n👁️ https://draftlol.dawe.gg/${data['roomId']}`;
       const messageTwo =
-        'Crear partida personalizada con la siguiente configuración:' +
-        '\nNombre: ' +
-        process.env.NAME_QUEUE +
-        matchNumber +
-        '\nContraseña: 12345';
+        `Crear partida personalizada con la siguiente configuración:\nNombre: ${process.env.NAME_QUEUE}${matchNumber}\nContraseña: 12345`;
       //embeds: [{ title: 'In-House Draft', description: message }],
       this.client.channels.fetch(channel).then((channelFetched) => {
         const text = channelFetched as TextBasedChannel;

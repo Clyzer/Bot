@@ -6,11 +6,13 @@ export class AppController {
   constructor(private readonly appService: AppService) {}
 
   @Post('/draft')
-  async getHello(@Body() body): Promise<string> {
-    if (body['action'] == 'MATCH_STARTED') {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  async getHello(@Body() body: any): Promise<string> {
+    // biome-ignore lint/complexity/useLiteralKeys: <explanation>
+    if (body['action'] === 'MATCH_STARTED') {
+      // biome-ignore lint/complexity/useLiteralKeys: <explanation>
       return this.appService.getDraftLol(body['channel'], body['match_number']);
-    } else {
-      return '¡Evento incorrecto!';
     }
+    return '¡Evento incorrecto!';
   }
 }
